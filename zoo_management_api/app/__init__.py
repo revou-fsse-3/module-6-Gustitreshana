@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_migrate import Migrate
 from app.routes import animals_route, employees_route
 import os
 from app.utils.database import db
@@ -15,6 +16,7 @@ DATABASE_PORT = os.getenv('DATABASE_PORT')
 app.config["SQLALCHEMY_DATABASE_URI"] = f"{DATABASE_TYPE}://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
 
 db.init_app(app)
+migrate = Migrate(app, db)
 
 from app.routes import animals_route, employees_route
 
