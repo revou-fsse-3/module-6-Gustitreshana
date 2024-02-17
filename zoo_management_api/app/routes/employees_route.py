@@ -1,48 +1,63 @@
-from flask import Blueprint, jsonify, request
-from models.employees import Employees
+from flask import Blueprint, request
+from app.models.employees import Employees
 from app.utils.database import db
 
 employees_blueprint = Blueprint('employees_endpoint', __name__)
 
 @employees_blueprint.route('/', methods=['GET'])
 def get_employees():
-    employees = Employees.query.all()
-    return jsonify([employee.serialize() for employee in employees])
+    try:
+        employees = Employees.query.all()
+        return [employee.as_dict() for employee in employees]
+    except Exception as e:
+        return str(e), 404 
 
-@employees_blueprint.route('/<int:id>', methods=['GET'])
+@employees_blueprint.route('/<string:id>', methods=['GET'])
 def get_employee(id):
-    employee = Employees.query.get_or_404(id)
-    return jsonify(employee.serialize())
+    try:
+        employee = Employees.query.get(id)
+        return employee.as_dict(), 200
+    except Exception as e:
+        return str(e), 404
+
 
 @employees_blueprint.route('/', methods=['POST'])
 def create_employee():
-    data = request.json
-    if not all(key in data for key in ['name', 'email', 'phone_number', 'role']):
-        return jsonify({'error': 'Missing required fields'}), 400
+    try:
+        data = request.json
+        employee = Employees()
+        employee.name = data['name']
+        employee.email = data['email']
+        employee.phone_number = data['phone_number']
+        employee.role = data['role']
+        employee.schedule = data.get('schedule')
+        db.session.add(employee)
+        db.session.commit()
+        return 'Employee created successfully', 201
+    except Exception as e:
+        return str(e), 404
 
-    employee = Employees(name=data['name'], email=data['email'], phone_number=data['phone_number'], role=data['role'], schedule=data.get('schedule', ''))
-    db.session.add(employee)
-    db.session.commit()
-    return jsonify({'message': 'Employee created successfully'}), 201
-
-@employees_blueprint.route('/<int:id>', methods=['PUT'])
+@employees_blueprint.route('/<string:id>', methods=['PUT'])
 def update_employee(id):
-    employee = Employees.query.get_or_404(id)
-    data = request.json
-    if not all(key in data for key in ['name', 'email', 'phone_number', 'role']):
-        return jsonify({'error': 'Missing required fields'}), 400
+    try:
+        employee = Employees.query.get(id)
+        data = request.json
+        employee.name = data['name']
+        employee.email = data['email']
+        employee.phone_number = data['phone_number']
+        employee.role = data['role']
+        employee.schedule = data.get('schedule', '')
+        db.session.commit()
+        return 'Employee updated successfully', 200
+    except Exception as e:
+        return str(e), 404
 
-    employee.name = data['name']
-    employee.email = data['email']
-    employee.phone_number = data['phone_number']
-    employee.role = data['role']
-    employee.schedule = data.get('schedule', '')
-    db.session.commit()
-    return jsonify({'message': 'Employee updated successfully'})
-
-@employees_blueprint.route('/<int:id>', methods=['DELETE'])
+@employees_blueprint.route('/<string:id>', methods=['DELETE'])
 def delete_employee(id):
-    employee = Employees.query.get_or_404(id)
-    db.session.delete(employee)
-    db.session.commit()
-    return jsonify({'message': 'Employee deleted successfully'})
+    try:
+        employee = Employees.query.get(id)
+        db.session.delete(employee)
+        db.session.commit()
+        return 'Employee deleted successfully', 200
+    except Exception as e:
+        return str(e), 404
