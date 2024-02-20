@@ -16,4 +16,4 @@ The Zoo Management API offers the following endpoints:
 
 You can access the Zoo Management API using the following base URL:
 
-- [link](https://documenter.getpostman.com/view/29213022/2sA2r9VNm7)
+- [Zoo Management API](https://documenter.getpostman.com/view/29213022/2sA2r9VNm7)
