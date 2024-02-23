@@ -15,7 +15,7 @@ def get_animals():
 @animals_blueprint.route("/<string:id>", methods=["GET"])
 def get_animal(id):
     try:
-        animal = Animals.query.get(id)
+        animal = db.session.get(Animals, id)
         return animal.as_dict(), 200
     except Exception as e:
         return str(e), 404
@@ -38,7 +38,7 @@ def create_animal():
 @animals_blueprint.route('/<string:id>', methods=['PUT'])
 def update_animal(id):
     try:
-        animal = Animals.query.get(id)
+        animal = db.session.get(Animals, id)
         data = request.json
         animal.species = data['species']
         animal.age = data['age']
@@ -53,7 +53,7 @@ def update_animal(id):
 @animals_blueprint.route('/<string:id>', methods=['DELETE'])
 def delete_animal(id):
     try:
-        animal = Animals.query.get(id)
+        animal = db.session.get(Animals, id)
         db.session.delete(animal)
         db.session.commit()
         return 'Animal deleted successfully', 200
