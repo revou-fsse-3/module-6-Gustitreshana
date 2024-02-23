@@ -1,6 +1,24 @@
-import requests
+from app.models.animals import Animals
 
-ENDPOINT = "https://documenter.getpostman.com/view/29213022/2sA2r9VNm7"
+def test_animals_models():
+    animal = Animals(
+    species="Lion",
+    age="10",
+    gender="Male",
+    special_requirement="None"
+)
 
-response = requests.get(ENDPOINT)
-print(response)
+    assert animal.species == "Lion"
+    assert animal.age == "10"
+    assert animal.gender == "Male"
+    assert animal.special_requirement == "None"
+
+    expected_dict = {
+        "id": animal.id,
+        "species": "Lion",
+        "age": "10",
+        "gender": "Male",
+        "special_requirement": "None"
+    }
+
+    assert animal.as_dict() == expected_dict

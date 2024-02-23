@@ -15,7 +15,7 @@ def get_employees():
 @employees_blueprint.route('/<string:id>', methods=['GET'])
 def get_employee(id):
     try:
-        employee = Employees.query.get(id)
+        employee = db.session.get(Employees, id)
         return employee.as_dict(), 200
     except Exception as e:
         return str(e), 404
@@ -40,7 +40,7 @@ def create_employee():
 @employees_blueprint.route('/<string:id>', methods=['PUT'])
 def update_employee(id):
     try:
-        employee = Employees.query.get(id)
+        employee = db.session.get(Employees, id)
         data = request.json
         employee.name = data['name']
         employee.email = data['email']
@@ -55,7 +55,7 @@ def update_employee(id):
 @employees_blueprint.route('/<string:id>', methods=['DELETE'])
 def delete_employee(id):
     try:
-        employee = Employees.query.get(id)
+        employee = db.session.get(Employees, id)
         db.session.delete(employee)
         db.session.commit()
         return 'Employee deleted successfully', 200
